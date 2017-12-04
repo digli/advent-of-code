@@ -37,9 +37,6 @@ const addData = (row) => {
 
 // travelling salesman :-))
 const findPaths = (node, path, distance) => {
-  if (path.length)
-    distance += path[path.length - 1].distanceTo(node);
-
   path.push(node);
 
   if (cities.length === path.length) {
@@ -50,12 +47,13 @@ const findPaths = (node, path, distance) => {
   cities.forEach(city => {
     // Avoid re-visiting city twice
     if (!path.some(x => x.name === city.name)) {
-      findPaths(city, path.slice(), distance);
+      findPaths(city, path.slice(), distance + city.distanceTo(node));
     }
   });
 }
 
-input.map(addData);
-findPaths(cities[0], [], 0);
+input.forEach(addData);
+cities.forEach(city => findPaths(city, [], 0));
+
 console.log(Math.min(...routes)); // 117
-console.log(Math.max(...routes)); // ?
+console.log(Math.max(...routes)); // 909
