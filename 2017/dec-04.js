@@ -5,7 +5,7 @@ const toWordArray = (row) => {
 }
 
 const hasNoDuplicate = (words) => {
-  return words.some((x, i) => words.some((y, j) => x === y && i !== j));
+  return new Set(words).size == words.length;
 }
 
 const sortByAlphabet = (words) => {
