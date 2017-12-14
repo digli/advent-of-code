@@ -11,7 +11,7 @@ const reverse = (list, index, num) => {
   }
 }
 
-const knot = (lengths, iterations=1) => {
+const knot = (lengths, iterations=64) => {
   const sequence = [...Array(256).keys()];
   let index = 0;
   let skipSize = 0;
@@ -42,29 +42,59 @@ const toHex = (sequence) => {
 }
 
 const knotHash = (key) => {
-  // sorry all eye users
-  return toHex(denseHash(knot([...key].map(x => x.charCodeAt(0)))));
+  const suffix = [17, 31, 73, 47, 23];
+  const lengths = [...key].map(x => x.charCodeAt(0)).concat(suffix);
+  const sequence = knot(lengths);
+  const dense = denseHash(sequence);
+  return toHex(dense);
 }
 
 const hexToBinary = (x) => {
   return [...x].map(y => parseInt(y, 16).toString(2).padStart(4, '0')).join('');
 }
 
-const part1 = (input) => {
-  const grid = [];
+const binaryHashGrid = (input) => {
+  return [...Array(128).keys()]
+    .map(i => knotHash(`${input}-${i}`))
+    .map(hexToBinary)
+    .map(x => [...x]);
+}
 
-  for (let i = 0; i < 128; i++) {
-    const hash = knotHash(`${input}-${i}`);
-    grid[i] = hexToBinary(hash);
+const buildRegion = (grid, x, y, n) => {
+  if (y < 0 || y >= grid.length || grid[y][x] !== '1')
+    return;
+
+  grid[y][x] = n;
+
+  buildRegion(grid, x + 1, y, n);
+  buildRegion(grid, x - 1, y, n);
+  buildRegion(grid, x, y + 1, n);
+  buildRegion(grid, x, y - 1, n);
+}
+
+const countRegions = (grid) => {
+  let numRegions = 0;
+
+  for (let i = 0; i < grid.length; i++) {
+    for (let j = 0; j < grid[0].length; j++) {
+      if (grid[i][j] === '1') {
+        buildRegion(grid, j, i, numRegions++);
+      }
+    }
   }
 
-  console.log(grid);
-  console.log(grid.map(x => [...x].filter(y => y === '1').length));
+  return numRegions;
+}
 
-  return grid.map(x => [...x].filter(y => y === '1').length)
+const part1 = (input) => {
+  return binaryHashGrid(input)
+    .map(x => x.filter(y => y === '1').length)
     .reduce((a, b) => a + b);
 }
 
+const part2 = (input) => {
+  return countRegions(binaryHashGrid(input));
+}
 
 console.log(part1(input));
-console.log(part1('flqrgnkx'));
+console.log(part2(input));
