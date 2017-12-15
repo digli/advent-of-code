@@ -61,7 +61,7 @@ const binaryHashGrid = (input) => {
 }
 
 const buildRegion = (grid, x, y, n) => {
-  if (y < 0 || y >= grid.length || grid[y][x] !== '1')
+  if (!grid[y] || grid[y][x] !== '1')
     return;
 
   grid[y][x] = n;
