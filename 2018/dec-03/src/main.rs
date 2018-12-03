@@ -12,22 +12,32 @@ struct Claim {
 }
 
 impl Claim {
-    fn occupy_fabric(&self, mut grid: &Box<[[i32; SIZE]; SIZE]>) {
+    fn occupy_fabric(&self, grid: &mut Vec<Vec<u32>>) {
         for x in 0..self.width {
             for y in 0..self.height {
-                // How do i reference the boxed value?
                 grid[self.y + y][self.x + x] += 1;
             }
         }
     }
+
+    fn does_not_overlap(&self, grid: &Vec<Vec<u32>>) -> bool {
+        for x in 0..self.width {
+            for y in 0..self.height {
+                if grid[self.y + y][self.x + x] > 1 {
+                    return false
+                }
+            }
+        }
+        true
+    }
 }
 
-fn parse_line(line: &str) -> Claim {
+fn parse_claim(line: &str) -> Claim {
     let parts: Vec<&str> = line.split_whitespace().collect();
     let coordinates: Vec<usize> = parts[2][0..parts[2].len() - 1].split(",")
         .map(|coord| coord.parse::<usize>().unwrap())
         .collect();
-    
+
     let dimensions: Vec<usize> = parts[3].split("x")
         .map(|dimension| dimension.parse::<usize>().unwrap())
         .collect();
@@ -41,29 +51,36 @@ fn parse_line(line: &str) -> Claim {
     }
 }
 
-fn read_input(filename: &str) -> Vec<Claim> {
+fn read_input_to_claim_array(filename: &str) -> Vec<Claim> {
     fs::read_to_string(filename)
         .expect("Input file not found")
         .lines()
-        .map(|line| parse_line(line))
+        .map(|line| parse_claim(line))
         .collect()
 }
 
-fn puzzle_one(input: &Vec<Claim>) -> u32 {
-    // How do I allocate a "large" array without overflowing the stack?
-    let grid = Box::new([[0; SIZE]; SIZE]);
+fn puzzle_one(grid: &Vec<Vec<u32>>) -> u32 {
+    grid.into_iter()
+        .map(|row| row.into_iter().fold(0, |acc, &val| if val > 1 { acc + 1 } else { acc }))
+        .fold(0, |acc, val| acc + val)
+}
 
-    for claim in input {
-        println!("{}", claim.id);
-        claim.occupy_fabric(&grid);
-    }
-
-    // TODO: Count every position in the grid occupied more than once
-    0
+fn puzzle_two<'a, 'b>(grid: &Vec<Vec<u32>>, claims: &'b Vec<Claim>) -> Option<&'b Claim> {
+    claims.iter()
+        .find(|claim| claim.does_not_overlap(&grid))
 }
 
 fn main() {
-    let input = read_input("test_input.txt");
-    println!("{:?}", input);
-    println!("The answer to puzzle 1 is {}", puzzle_one(&input));
+    let claims = read_input_to_claim_array("input.txt");
+    let mut grid: Vec<Vec<u32>> = vec![vec![0; SIZE]; SIZE];
+
+    for claim in &claims {
+        claim.occupy_fabric(&mut grid);
+    }
+
+    println!("The answer to puzzle 1 is {}", puzzle_one(&grid));
+    match puzzle_two(&grid, &claims) {
+        Some(claim) => println!("The answer to puzzle 2 is {}", claim.id),
+        None => println!("Couln't find the correct claim for puzzle 2")
+    }
 }
