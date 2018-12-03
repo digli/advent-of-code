@@ -1,0 +1,6 @@
+[package]
+name = "dec-03"
+version = "0.1.0"
+authors = ["digli <elliot.j@live.se>"]
+
+[dependencies]
