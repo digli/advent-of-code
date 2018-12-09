@@ -1,0 +1,8 @@
+[package]
+name = "dec-09"
+version = "0.1.0"
+authors = ["digli <elliot.j@live.se>"]
+edition = "2018"
+
+[dependencies]
+slab = "0.4.1"
