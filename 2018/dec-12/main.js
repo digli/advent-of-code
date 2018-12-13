@@ -1,8 +1,11 @@
 'use strict';
 
+const fs = require('fs');
+
 // Game of pots
 
-const input = document.body.textContent.trim().split('\n');
+const input = fs.readFileSync('./input.txt').toString().split('\n');
+// const input = document.body.textContent.trim().split('\n');
 // const input = `initial state: #..#.#..##......###...###
 
 // ...## => #
@@ -52,13 +55,13 @@ const game = (initialState, patterns, numIterations) => {
             }
         }
 
-        const stateCount = countState(state, extraDots.length / 2 * i);
+        const stateCount = countState(state, extraDots.length / 2 * (i + 1));
         const diff = stateCount - prevCount;
 
         if (diff === prevDiff) {
             // We have stabilized!
-            console.log({ stateCount, diff, numIterations, i });
-            return stateCount + diff * (numIterations - i);
+            console.log({ stateCount, diff, numIterations, i: i + 1 });
+            return stateCount + diff * (numIterations - (i + 1));
         }
 
         prevState = state;
