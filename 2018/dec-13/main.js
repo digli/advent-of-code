@@ -27,11 +27,13 @@ class Cart {
     }
 
     turn () {
-        this.direction = {
+        const newDirectionIndex = {
             0: DIRECTIONS.indexOf(this.direction) - 1, // left
+            1: DIRECTIONS.indexOf(this.direction),
             2: DIRECTIONS.indexOf(this.direction) + 1 // right
-        }[this.direction] || this.direction;
+        }[this.intersection];
 
+        this.direction = DIRECTIONS[modulo(newDirectionIndex, DIRECTIONS.length)];
         this.intersection = (this.intersection + 1) % 3;
     }
 
@@ -42,7 +44,7 @@ class Cart {
                 switch (grid[this.y][this.x]) {
                     case '/': this.direction = 'right'; return;
                     case '\\': this.direction = 'left'; return;
-                    case '+': this.turn();
+                    case '+': this.turn(); return;
                     default: return;
                 }
             }
@@ -51,7 +53,7 @@ class Cart {
                 switch (grid[this.y][this.x]) {
                     case '/': this.direction = 'up'; return;
                     case '\\': this.direction = 'down'; return;
-                    case '+': this.turn();
+                    case '+': this.turn(); return;
                     default: return;
                 }
             }
@@ -60,7 +62,7 @@ class Cart {
                 switch (grid[this.y][this.x]) {
                     case '/': this.direction = 'left'; return;
                     case '\\': this.direction = 'right'; return;
-                    case '+': this.turn();
+                    case '+': this.turn(); return;
                     default: return;
                 }
             }
@@ -69,7 +71,7 @@ class Cart {
                 switch (grid[this.y][this.x]) {
                     case '/': this.direction = 'down'; return;
                     case '\\': this.direction = 'up'; return;
-                    case '+': this.turn();
+                    case '+': this.turn(); return;
                     default: return;
                 }
             }
@@ -81,8 +83,8 @@ class Cart {
     }
 }
 
-const puzzleOne = (input) => {
-    const carts = [];
+const puzzle = (input) => {
+    let carts = [];
     for (let y = 0; y < input.length; y++) {
         for (let x = 0; x < input[y].length; x++) {
             const char = input[y][x];
@@ -92,19 +94,26 @@ const puzzleOne = (input) => {
         }
     }
 
-
     for (;;) {
         carts.sort((a, b) => a.compareTo(b));
+        const cartsToDelete = [];
 
         for (const cart of carts) {
+            if (cartsToDelete.includes(cart)) continue;
             cart.move(input);
 
-            if (carts.some(c => c !== cart && c.compareTo(cart) === 0)) {
-                return `collision at ${cart.x},${cart.y}`;
+            const collision = carts.find(c => c !== cart && c.compareTo(cart) === 0);
+            if (collision) {
+                console.log(`collision at ${cart.x},${cart.y}`);
+                cartsToDelete.push(cart, collision);
             }
+        }
+
+        carts = carts.filter(c => !cartsToDelete.includes(c));
+        if (carts.length === 1) {
+            return carts[0];
         }
     }
 }
 
-// "collision at -209929,69" what
-puzzleOne(input);
+puzzle(input);
