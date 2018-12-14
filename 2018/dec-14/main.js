@@ -29,7 +29,7 @@ const getIterations = (initialState, recipe) => {
     const state = [...initialState];
     const elfPos = [...Array(initialState.length).keys()];
 
-    for (let iteration = 0; ; iteration++) {
+    for (;;) {
         const sum = elfPos.map(pos => state[pos])
             .reduce((a, b) => a + b);
 
@@ -39,14 +39,18 @@ const getIterations = (initialState, recipe) => {
             elfPos[i] %= state.length;
         }
 
-        const foundRecipe = state.slice(state.length - (recipe.length + 3)).join('')
+        const foundRecipe = state.slice(state.length - (recipe.length + 2)).join('')
             .includes(recipe);
         if (foundRecipe) {
-            return iteration;
+            return (
+                state.slice(state.length - (recipe.length + 1)).join('') === recipe
+                    ? state.length - recipe.length
+                    : state.length - recipe.length - 1
+            )
         }
 
     }
 }
 
 console.log('The answer to puzzle 1 is', getScore(initialState, input));
-console.log('The answer to puzzle 2 is not', getIterations(initialState, String(input)));
+console.log('The answer to puzzle 2 is', getIterations(initialState, String(input)));
