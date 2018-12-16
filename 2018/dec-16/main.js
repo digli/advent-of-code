@@ -98,5 +98,5 @@ const puzzleTwo = (input) => {
     return reg[0];
 }
 
-puzzleOne(input);
-puzzleTwo(input);
+console.log('The answer to puzzle 1 is', puzzleOne(input));
+console.log('The answer to puzzle 1 is', puzzleTwo(input));
