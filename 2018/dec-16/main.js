@@ -99,4 +99,4 @@ const puzzleTwo = (input) => {
 }
 
 console.log('The answer to puzzle 1 is', puzzleOne(input));
-console.log('The answer to puzzle 1 is', puzzleTwo(input));
+console.log('The answer to puzzle 2 is', puzzleTwo(input));
